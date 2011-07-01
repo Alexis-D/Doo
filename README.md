@@ -67,6 +67,6 @@ But if you want an example:
 License ?
 =========
 
-You like it? Cool, do whatever you want with it!
+You like it? Cool, do whatever you want with it!  
 You dislike it? Cool, don't use it!
 

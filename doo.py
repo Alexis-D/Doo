@@ -35,8 +35,7 @@ class Doo:
 
     def clear(self):
         """Empty the doo file, create it if it doesn't exist."""
-        with open(self.doo_path, 'w+'):
-            pass
+        open(self.doo_path, 'w+').close()
 
     def show(self):
         """Show the todo list."""
@@ -104,16 +103,16 @@ if __name__ == '__main__':
             print('The first argument of replace should be an integer.',
                   file=sys.stderr)
         except AssertionError:
-            print('replace takes two args.', file=sys.stderr)
+            print('replace takes at least two args.', file=sys.stderr)
 
     elif l == 2 and sys.argv[1] in ['h', '-h', 'help', '--help']:
         print(textwrap.dedent('''\
-                doo is a simple way to manage you todo list.
+                doo is a simple tool to help you tomanage your todo list.
 
                 doo : list all task.
                 doo rm 1 : remove the task #1.
                 doo rm 1 3 : remove task #1, #3
-                doo rp 1 change task : change task #1 to "change task"
+                doo rp 1 replace task : replace task #1 to "replace task"
                 doo clear : remove all tasks.
                 doo help : show this help.
                 doo Conquer the world. : add the "Conquer the world."
@@ -121,7 +120,7 @@ if __name__ == '__main__':
                 
                 Want to use one of the command in your task ? Simply use
                 the shell quotes :
-                    $ doo "clear my bedroom :)"
+                    $ doo "help myself to stop procrastinating"
 
                 Aliases :
                     r, -r, rm, remove
