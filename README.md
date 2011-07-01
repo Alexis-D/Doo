@@ -1,17 +1,19 @@
 How To Install ?
 ================
 
-$ sudo make # pretty easy, huh?
+    $ sudo make # pretty easy, huh?
 
 How To Use ?
 ============
 
 Run :
+
     $ doo help
 
 It will give you a quick ref.
 
 But if you want an example:
+
     19:36 <alexis in ~> $ doo
     19:36 <alexis in ~> $ rm .doo 
     19:36 <alexis in ~> $ doo Improve doo.
@@ -44,6 +46,7 @@ But if you want an example:
        4 - Dolor sit amet
 
 *New* : now you can replace your tasks:
+
     19:56 <alexis in ~> $ doo
        0 - Improve doo.
        1 - Fill erasmus paperwork.
