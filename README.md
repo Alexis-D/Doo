@@ -6,63 +6,65 @@ How To Install ?
 How To Use ?
 ============
 
-Run :
+Here is pretty everything you can do with doo:
 
-    $ doo help
 
-It will give you a quick ref.
-
-But if you want an example:
-
-    19:36 <alexis in ~> $ doo
-    19:36 <alexis in ~> $ rm .doo 
-    19:36 <alexis in ~> $ doo Improve doo.
-    19:36 <alexis in ~> $ doo
+    $ doo
+    $ doo h
+    doo is a simple tool designed to help you to manage your todo list.
+    
+    doo                    : list all tasks.
+    doo rm 1               : remove the task #1.
+    doo rm 1 3             : remove tasks #1, #3.
+    doo rp 1 new task      : replace task #1 to "new task"
+    doo cl                 : remove all tasks.
+    doo h                  : show this help.
+    doo Conquer the world. : add the "Conquer the world."
+                             task to the list.
+    
+    Want to use one of the command in your task ? Simply use
+    the shell quotes :
+        $ doo "cl whatever."
+    
+    Aliases:
+        r, rm
+        R, rp
+        h, -h
+        c, cl
+    
+    $ doo Improve doo.
+    $ doo Stop procrastinating.
+    $ doo
        0 - Improve doo.
-    19:36 <alexis in ~> $ doo Fill erasmus paperwork.
-    19:36 <alexis in ~> $ doo
-       0 - Improve doo.
-       1 - Fill erasmus paperwork.
-    19:36 <alexis in ~> $ doo Try Flask + AppEngine
-    19:36 <alexis in ~> $ doo
-       0 - Improve doo.
-       1 - Fill erasmus paperwork.
-       2 - Try Flask + AppEngine
-    19:36 <alexis in ~> $ doo Lorem ispum
-    19:37 <alexis in ~> $ doo Dolor sit amet
-    19:37 <alexis in ~> $ doo 
-       0 - Improve doo.
-       1 - Fill erasmus paperwork.
-       2 - Try Flask + AppEngine
-       3 - Lorem ispum
-       4 - Dolor sit amet
-    19:37 <alexis in ~> $ doo rm 3
-    19:37 <alexis in ~> $ doo new task #3
-    19:37 <alexis in ~> $ doo
-       0 - Improve doo.
-       1 - Fill erasmus paperwork.
-       2 - Try Flask + AppEngine
-       3 - new task
-       4 - Dolor sit amet
-
-*New* : now you can replace your tasks:
-
-    19:56 <alexis in ~> $ doo
-       0 - Improve doo.
-       1 - Fill erasmus paperwork.
-       2 - Try Flask + AppEngine.
-    19:56 <alexis in ~> $ doo useless
-    19:56 <alexis in ~> $ doo
-       0 - Improve doo.
-       1 - Fill erasmus paperwork.
-       2 - Try Flask + AppEngine.
-       3 - useless
-    19:56 <alexis in ~> $ doo rp 3 useful
-    19:56 <alexis in ~> $ doo
-       0 - Improve doo.
-       1 - Fill erasmus paperwork.
-       2 - Try Flask + AppEngine.
-       3 - useful
+       1 - Stop procrastinating.
+    $ doo R doo is already awesome, nope?
+    $ doo
+       0 - doo is already awesome, nope?
+       1 - Stop procrastinating.
+    $ doo a
+    $ doo b
+    $ doo d
+    $ doo e
+    $ doo
+       0 - doo is already awesome, nope?
+       1 - Stop procrastinating.
+       2 - a
+       3 - b
+       4 - d
+       5 - e
+    $ doo rm 2
+    $ doo
+       0 - doo is already awesome, nope?
+       1 - Stop procrastinating.
+       3 - b
+       4 - d
+       5 - e
+    $ doo rm 2 3 4 5
+    $ doo
+       0 - doo is already awesome, nope?
+       1 - Stop procrastinating.
+    $ doo cl
+    $ doo
 
 License ?
 =========

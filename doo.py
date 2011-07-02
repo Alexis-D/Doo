@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 
+import json
 import os
 import os.path as path
-import re
 import sys
 import textwrap
 
 DOO_PATH = path.join(path.expanduser('~'), '.doo')
 FORMAT = '{:4d} - {}'
-PARSE_STRING = '^\s*(\d+) - (.*)$'
+# PARSE_STRING = '^\s*(\d+) - (.*)$'
 MININDEX = 0
 
 class Doo:
@@ -19,67 +19,72 @@ class Doo:
         self.doo_path = doo_path or DOO_PATH
 
         if not path.exists(self.doo_path):
-            self.clear()
+            self.conf = {}
+            self.save(emptyList=True)
 
-    def _tasks(self):
-        """Return the task list."""
-        tasks = []
+        with open(self.doo_path) as f:
+            data = json.loads(f.read())
 
-        with open(self.doo_path, 'r') as f:
-            for t in f.readlines():
-                idx, task = re.findall(PARSE_STRING, t)[0]
-                tasks.append((int(idx), task))
+        self.conf = data['conf']
+        self.tasks = data['tasks']
 
-        return tasks
+    def save(self, emptyList=False):
+        """Save the list to self.doo_path.
+           If emptyList == True, then the saved tasklist is []"""
+        with open(self.doo_path, 'w+') as f:
+            f.write(json.dumps({
+                                'conf': self.conf,
+                                'tasks': [] if emptyList else self.tasks,
+                                }))
 
-
-    def clear(self):
-        """Empty the doo file, create it if it doesn't exist."""
-        open(self.doo_path, 'w+').close()
+    def sort(self):
+        """Sort the task list."""
+        self.tasks.sort(key=lambda x: int(x[0]))
 
     def show(self):
         """Show the todo list."""
-        with open(self.doo_path) as f:
-            print(f.read(), end='')
+        self.sort()
+        for i, t in self.tasks:
+            print(FORMAT.format(i, t))
+
+        return self
 
     def replace(self, idx, new):
         """Replace the task with id idx of the list by new."""
-        tasks = self._tasks()
+        self.sort()
+        for listid, (i, t) in enumerate(self.tasks):
+            if i == idx:
+                self.tasks[listid] = [i, new] # don't use tuples
+                                              # because they doesn't
+                                              # exists in json
+                return self
 
-        with open(self.doo_path, 'w+') as f:
-            for i, t in tasks:
-                if i == idx:
-                    t = new
-
-                print(FORMAT.format(i, t), file=f)
+        raise KeyError('Task #{} doesn\'t exist.'.format(idx))
 
     def rm(self, idx):
         """Remove the task with id idx of the list."""
-        tasks = self._tasks()
+        self.sort()
+        for listid, (i, t) in enumerate(self.tasks):
+            if i == idx:
+                self.tasks.remove([i, t])
+                return self
 
-        with open(self.doo_path, 'w+') as f:
-            for i, t in tasks:
-                if i != idx:
-                    print(FORMAT.format(i, t), file=f)
+        raise KeyError('Task #{} doesn\'t exist.'.format(idx))
 
     def add(self, new):
         """Add the new task to the list."""
-        tasks = self._tasks()
+        self.sort()
         last = MININDEX - 1
-        added = False
 
-        with open(self.doo_path, 'w+') as f:
-            for i, t in tasks:
-                if i != last + 1:
-                    print(FORMAT.format(last + 1, new), file=f)
-                    added = True
+        for listid, (i, t) in enumerate(self.tasks):
+            if i != last + 1:
+                self.tasks.insert(listid + 1, [last + 1, new])
+                return self
 
-                print(FORMAT.format(i, t), file=f)
-                last = i
+            last = i
 
-            if not added:
-                print(FORMAT.format(last + 1, new), file=f)
-
+        self.tasks.append([last + 1, new])
+        return self
 
 if __name__ == '__main__':
     doo = Doo(os.getenv('DOO_PATH'))
@@ -88,51 +93,59 @@ if __name__ == '__main__':
     if l == 1:
         doo.show()
 
-    elif sys.argv[1] in ['r', '-r', 'rm', 'remove']:
-        try:
-            for i in sys.argv[2:]:
-                doo.rm(int(i))
-        except ValueError:
-            print('All arguments of rm should be a integer.', file=sys.stderr)
+    elif sys.argv[1] in ['r', 'rm']:
+        for i in sys.argv[2:]:
+            try:
+                idx = int(i)
+            except ValueError:
+                print('All arguments of rm should be a integer.',
+                      file=sys.stderr)
+            else:
+                try:
+                    doo.rm(idx)
+                except KeyError as e:
+                    print(e, file=sys.stderr)
 
-    elif sys.argv[1] in ['rp', 'replace']:
+        doo.save()
+
+    elif sys.argv[1] in ['R', 'rp']:
         try:
             assert l > 3
-            doo.replace(int(sys.argv[2]), ' '.join(sys.argv[3:]))
+            doo.replace(int(sys.argv[2]), ' '.join(sys.argv[3:])).save()
         except ValueError:
             print('The first argument of replace should be an integer.',
                   file=sys.stderr)
         except AssertionError:
             print('replace takes at least two args.', file=sys.stderr)
 
-    elif l == 2 and sys.argv[1] in ['h', '-h', 'help', '--help']:
+    elif l == 2 and sys.argv[1] in ['h', '-h']:
         print(textwrap.dedent('''\
-                doo is a simple tool to help you tomanage your todo list.
+                doo is a simple tool designed to help you to manage your todo list.
 
-                doo : list all task.
-                doo rm 1 : remove the task #1.
-                doo rm 1 3 : remove task #1, #3
-                doo rp 1 replace task : replace task #1 to "replace task"
-                doo clear : remove all tasks.
-                doo help : show this help.
+                doo                    : list all tasks.
+                doo rm 1               : remove the task #1.
+                doo rm 1 3             : remove tasks #1, #3.
+                doo rp 1 new task      : replace task #1 to "new task"
+                doo cl                 : remove all tasks.
+                doo h                  : show this help.
                 doo Conquer the world. : add the "Conquer the world."
                                          task to the list.
                 
                 Want to use one of the command in your task ? Simply use
                 the shell quotes :
-                    $ doo "help myself to stop procrastinating"
+                    $ doo "cl whatever."
 
-                Aliases :
-                    r, -r, rm, remove
-                    rp, replace
-                    h, -h, help, --help
-                    c, -c, clear
+                Aliases:
+                    r, rm
+                    R, rp
+                    h, -h
+                    c, cl
                 '''),
               file=sys.stderr) 
 
-    elif l == 2 and sys.argv[1] in ['c', '-c', 'clear']:
-        doo.clear()
+    elif l == 2 and sys.argv[1] in ['c', 'cl']:
+        doo.save(emptyList=True)
 
     else:
-        doo.add(' '.join(sys.argv[1:]))
+        doo.add(' '.join(sys.argv[1:])).save()
 
