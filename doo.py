@@ -7,7 +7,7 @@ import os.path as path
 import sys
 import textwrap
 
-DOO_PATH = path.join(path.expanduser('~'), '.doo')
+DOO_PATH = path.expanduser('~/.doo')
 FORMAT = '{:4d} - {}'
 # PARSE_STRING = '^\s*(\d+) - (.*)$'
 MININDEX = 0
